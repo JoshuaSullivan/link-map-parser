@@ -1,7 +1,12 @@
+import Foundation
 import ArgumentParser
 
 @main
 struct LinkMapParser: ParsableCommand {
+    
+    enum Error: Swift.Error {
+        case couldNotFindLinkMap
+    }
 
     static var configuration = CommandConfiguration(
         commandName: "link-map-parser",
@@ -24,6 +29,9 @@ struct LinkMapParser: ParsableCommand {
 
 
     mutating func run() throws {
-        print(linkMapPath)
+        let appUrl = URL(filePath: FileManager.default.currentDirectoryPath)
+        let mapUrl = appUrl.appending(path: linkMapPath)
+
+        try Analyzer.analyze(linkMapUrl: mapUrl, verbose: true)
     }
 }
