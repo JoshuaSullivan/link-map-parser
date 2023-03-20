@@ -2,7 +2,7 @@ import Foundation
 import ArgumentParser
 
 @main
-struct LinkMapParser: ParsableCommand {
+struct LinkMapParser: AsyncParsableCommand {
     
     enum Error: Swift.Error {
         case couldNotFindLinkMap
@@ -17,21 +17,32 @@ struct LinkMapParser: ParsableCommand {
     @Argument(help: "The path to the link map.")
     var linkMapPath: String
 
+    /// The output path, if any.
     @Argument(help: ArgumentHelp("The output file path. If omitted, the result will be printed to stdout.", valueName: "output-file"))
     var outputPath: String? = nil   
 
-    /// When present, indicates that the provided file should have its symbols printed.
-    @Option(help: ArgumentHelp("The file to print symbols for. Do not include '.swift' extension.", valueName: "file-name"))
-    var printSymbolsForFile: String? = nil
+//    /// When present, indicates that the provided file should have its symbols printed.
+//    @Option(help: ArgumentHelp("The file to print symbols for. Do not include '.swift' extension.", valueName: "file-name"))
+//    var printSymbolsForFile: String? = nil
 
-    @Flag(help: "Print out progress information as app works.")
+    /// When `true`, progress will be printed as the app works.
+    @Flag(name: .shortAndLong, help: "Print out progress information as app works.")
     var verbose: Bool = false
 
 
-    mutating func run() throws {
+    mutating func run() async throws {
         let appUrl = URL(filePath: FileManager.default.currentDirectoryPath)
         let mapUrl = appUrl.appending(path: linkMapPath)
 
-        try Analyzer.analyze(linkMapUrl: mapUrl, verbose: true)
+        let report = try await Analyzer.asyncAnalyze(linkMapUrl: mapUrl, verbose: verbose)
+        
+        if let outputPath {
+            let outputUrl = appUrl.appending(path: outputPath)
+            if verbose { print("Writing to \(outputUrl.path())") }
+            try? FileManager.default.removeItem(at: outputUrl)
+            try report.data(using: .utf8)?.write(to: outputUrl)
+        } else {
+            print(report)
+        }
     }
 }
