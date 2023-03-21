@@ -25,6 +25,9 @@ struct LinkMapParser: AsyncParsableCommand {
 //    @Option(help: ArgumentHelp("The file to print symbols for. Do not include '.swift' extension.", valueName: "file-name"))
 //    var printSymbolsForFile: String? = nil
 
+    @Flag(name: .shortAndLong, help: "Include only module sizes in the final report.")
+    var moduleOnly: Bool = false
+    
     /// When `true`, progress will be printed as the app works.
     @Flag(name: .shortAndLong, help: "Print out progress information as app works.")
     var verbose: Bool = false
@@ -34,7 +37,7 @@ struct LinkMapParser: AsyncParsableCommand {
         let appUrl = URL(filePath: FileManager.default.currentDirectoryPath)
         let mapUrl = appUrl.appending(path: linkMapPath)
 
-        let report = try await Analyzer.asyncAnalyze(linkMapUrl: mapUrl, verbose: verbose)
+        let report = try await Analyzer.analyze(linkMapUrl: mapUrl, verbose: verbose, moduleOnly: moduleOnly)
         
         if let outputPath {
             let outputUrl = appUrl.appending(path: outputPath)

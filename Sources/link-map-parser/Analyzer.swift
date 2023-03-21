@@ -14,7 +14,7 @@ struct Analyzer {
     
     private static var verbose: Bool = false
     
-    static func asyncAnalyze(linkMapUrl: URL, printFileSymbols: String? = nil, verbose: Bool = false) async throws -> String {
+    static func analyze(linkMapUrl: URL, printFileSymbols: String? = nil, verbose: Bool = false, moduleOnly: Bool = false) async throws -> String {
         self.verbose = verbose
         
         var currentSection = MapSection.other
@@ -86,7 +86,7 @@ struct Analyzer {
         
         let output = "\n===========\nSIZE REPORT\n==========="
         return modules.reduce(into: output) { partialResult, module in
-            partialResult += "\n\(module.sizeReport)"
+            partialResult += "\n\(module.sizeReport(includeFiles: !moduleOnly))"
         }
     }
     

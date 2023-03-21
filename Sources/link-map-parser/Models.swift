@@ -165,9 +165,11 @@ struct Module: CustomStringConvertible, Comparable {
     
     private(set) var size: Int = 0
     
-    var sizeReport: String {
+    func sizeReport(includeFiles: Bool = true) -> String {
         var str = "\(name) (\(size))"
-        files.forEach { str += "\n\t\($0.sizeReport)" }
+        if includeFiles {
+            files.forEach { str += "\n\t\($0.sizeReport)" }
+        }
         return str
     }
     
