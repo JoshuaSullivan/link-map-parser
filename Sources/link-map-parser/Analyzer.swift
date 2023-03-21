@@ -84,7 +84,7 @@ struct Analyzer {
         log("Creating Modules...")
         let modules = groupedFiles.map { name, files in Module(name: name, files: files.sorted().reversed()) }.sorted()
         
-        var output = "\n===========\nSIZE REPORT\n==========="
+        let output = "\n===========\nSIZE REPORT\n==========="
         return modules.reduce(into: output) { partialResult, module in
             partialResult += "\n\(module.sizeReport)"
         }

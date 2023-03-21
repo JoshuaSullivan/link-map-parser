@@ -82,7 +82,10 @@ struct ObjectFile: CustomStringConvertible, Equatable, Comparable {
         } transform: { Int($0)! }
         "]"
         OneOrMore(.any, .reluctant)
-        "Debug-iphoneos/"
+        ChoiceOf {
+            "Debug-iphoneos/"
+            "Debug-iphonesimulator/"
+        }
         Capture {
           OneOrMore(.word)
         } transform: { String($0) }
