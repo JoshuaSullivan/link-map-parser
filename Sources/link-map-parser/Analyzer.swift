@@ -14,7 +14,7 @@ struct Analyzer {
     
     private static var verbose: Bool = false
     
-    static func analyze(linkMapUrl: URL, printFileSymbols: String? = nil, verbose: Bool = false, moduleOnly: Bool = false) async throws -> String {
+    static func analyze(linkMapUrl: URL, printFileSymbols: String? = nil, verbose: Bool = false, moduleOnly: Bool = false, csvOutput: Bool = false) async throws -> String {
         self.verbose = verbose
         
         var currentSection = MapSection.other
@@ -84,9 +84,16 @@ struct Analyzer {
         log("Creating Modules...")
         let modules = groupedFiles.map { name, files in Module(name: name, files: files.sorted().reversed()) }.sorted()
         
-        let output = "\n===========\nSIZE REPORT\n==========="
-        return modules.reduce(into: output) { partialResult, module in
-            partialResult += "\n\(module.sizeReport(includeFiles: !moduleOnly))"
+        if csvOutput {
+            let output = "Module,File,Size(b)\n"
+            return modules.reduce(into: output) { partialResult, module in
+                partialResult += module.sizeReport(includeFiles: !moduleOnly, csvOutput: csvOutput)
+            }
+        } else {
+            let output = "\n===========\nSIZE REPORT\n==========="
+            return modules.reduce(into: output) { partialResult, module in
+                partialResult += "\n\(module.sizeReport(includeFiles: !moduleOnly))"
+            }
         }
     }
     

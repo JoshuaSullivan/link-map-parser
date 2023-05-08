@@ -165,12 +165,22 @@ struct Module: CustomStringConvertible, Comparable {
     
     private(set) var size: Int = 0
     
-    func sizeReport(includeFiles: Bool = true) -> String {
-        var str = "\(name) (\(size))"
-        if includeFiles {
-            files.forEach { str += "\n\t\($0.sizeReport)" }
+    func sizeReport(includeFiles: Bool = true, csvOutput: Bool = false) -> String {
+        if csvOutput {
+            if includeFiles {
+                return files.reduce(into: "") { partialResult, file in
+                    partialResult += "\(name),\(file.file),\(file.size)\n"
+                }
+            } else {
+                return "\(name),,\(size)"
+            }
+        } else {
+            var str = "\(name) (\(size))"
+            if includeFiles {
+                files.forEach { str += "\n\t\($0.sizeReport)" }
+            }
+            return str
         }
-        return str
     }
     
     init(name: String, files: [ObjectFile]) {

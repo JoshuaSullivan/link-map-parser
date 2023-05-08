@@ -31,13 +31,16 @@ struct LinkMapParser: AsyncParsableCommand {
     /// When `true`, progress will be printed as the app works.
     @Flag(name: .shortAndLong, help: "Print out progress information as app works.")
     var verbose: Bool = false
+    
+    @Flag(name: .customLong("csv", withSingleDash: true), help: "Output will be in CSV format for easier importing into spreadsheets.")
+    var csvOutput: Bool = false
 
 
     mutating func run() async throws {
         let appUrl = URL(filePath: FileManager.default.currentDirectoryPath)
         let mapUrl = appUrl.appending(path: linkMapPath)
 
-        let report = try await Analyzer.analyze(linkMapUrl: mapUrl, verbose: verbose, moduleOnly: moduleOnly)
+        let report = try await Analyzer.analyze(linkMapUrl: mapUrl, verbose: verbose, moduleOnly: moduleOnly, csvOutput: csvOutput)
         
         if let outputPath {
             let outputUrl = appUrl.appending(path: outputPath)
